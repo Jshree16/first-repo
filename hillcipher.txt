@@ -1,0 +1,206 @@
+#include <stdio.h>
+#include<string.h>
+#include<math.h>
+
+
+int k[3][3];
+int p[3][1];
+int c[3][1];
+int c2[3][1];
+char str[20];
+int determinant=0;
+int deter=0;
+int cofactor[3][3];
+int transpose[3][3];
+int a,b;
+char cipher[20];
+char original[20];
+char alpha[26]="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+int n;
+int n1;
+int n2;
+int a1;
+int temp;
+int temp1=0;
+int flag=0;
+int count=0;
+
+ void crypto(char str[],int k[3][3]);
+
+int check(int x)
+{
+    if (x % 3 == 0)
+        return 0;
+
+    int a = x / 3;
+    int b = 3 * (a + 1);
+    int c = b - x;
+
+    return c;
+}
+int main()
+{
+    int i, j;
+
+    printf("Enter the 3x3 key matrix\n");
+    for (i = 0; i < 3; ++i)
+    {
+        for (j = 0; j < 3; ++j)
+        {
+            scanf("%d", &k[i][j]);
+        }
+    }
+    printf("Enter the string to be encrypted\n");
+    scanf("%s",str);
+    n=strlen(str);
+    temp=check(n);
+    if(temp>0)
+    {
+  printf("Enter %d charaters along with the string",temp);
+  scanf("%s",str);
+    }
+  n1=(n+temp)/3;
+  flag=0;
+  printf("Ciphertext is: ");
+  void crypto(char str[],int k[3][3])
+  {
+  while (n1 > 0)
+    {
+        temp1=0;
+        count = 0;
+        for (i = flag; i < flag + 3; ++i)
+        {
+                if(str[i] >= 'a' && str[i] <= 'z')
+                {
+                    str[i] = str[i] - 32;
+                 }
+                 //printf("%c",str[i]);
+                 temp1=(int)(str[i]-'A');
+                 p[count][0]=temp1;
+                 count++;
+                 //printf("%d",p[i][0]);
+
+        }
+       int k1;
+        for (i = 0; i < 3; ++i)
+            c[i][0] = 0;
+
+        for (i = 0; i < 3; ++i)
+        {
+            for (j = 0; j < 1; ++j)
+            {
+                for (k1 = 0; k1< 3; ++k1)
+                    c[i][j] += k[i][k1]  *  p[k1][j];
+            }
+        }
+        for (i = 0; i < 3; ++i)
+        {
+            c[i][0] = c[i][0] % 26;
+            //printf("%c ", (char) (c[i][0] + 65));
+            cipher[i+flag]=(char)(c[i][0] + 65);
+        }
+        for (i = 0; i < 3; ++i)
+            p[i][0] = 0;
+        n1 = n1 - 1;
+        flag = flag + 3;
+    }
+     //for (i = 0; i < (n+temp); ++i)
+    printf("%s",cipher);
+  }
+  crypto(str,k);
+    printf("\n");
+    int d=0;
+    int c1=0;
+    for(i=0;i<3;i++)
+      determinant = determinant + (k[0][i]*(k[1][(i+1)%3]*k[2][(i+2)%3] - k[1][(i+2)%3]*k[2][(i+1)%3]));
+     // printf("\n%d\n",determinant);
+      while(deter!=1)
+      {
+      d++;
+      deter=(determinant*d)%26;
+      }
+        //printf("%d\n",d);
+        printf("\nCo-factor matrix: \n");
+
+           for(i=0;i<3;i++)
+            {
+              for(j=0;j<3;j++)
+                {
+
+                    //printf("%d\t",((k[(i+1)%3][(j+1)%3] * k[(i+2)%3][(j+2)%3]) - (k[(i+1)%3][(j+2)%3]*k[(i+2)%3][(j+1)%3])));
+                    cofactor[i][j]=((k[(i+1)%3][(j+1)%3] * k[(i+2)%3][(j+2)%3]) - (k[(i+1)%3][(j+2)%3]*k[(i+2)%3][(j+1)%3]));
+                  }
+                  }
+
+            for(i=0;i<3;i++)
+            {
+              for(j=0;j<3;j++)
+              {
+                  printf("%d\t",cofactor[i][j]);
+              }
+              printf("\n");
+            }
+
+            for(i=0;i<3;i++)
+            {
+                  a=0.0;
+                  b=0.0;
+
+              for(j=0;j<3;j++)
+                {
+                    if(cofactor[i][j]<0)
+                  {
+                     a=(cofactor[i][j]/26)-1;
+                     // printf("%d\n",a);
+                      b=(-(a*26))+cofactor[i][j];
+                      //printf("%d\n",b);
+                      cofactor[i][j]=b;
+                     //printf("%d\n",(int)cofactor[i][j]);
+                  }
+                  a=0;
+                  b=0;
+
+                }
+            }
+            printf("\n");
+            printf("Negative removed: \n");
+            for(i=0;i<3;i++)
+            {
+              for(j=0;j<3;j++)
+              {
+                  printf("%d\t",cofactor[i][j]);
+              }
+              printf("\n");
+            }
+
+            printf("\nInverse of the matrix:\n");
+                for (i = 0; i < 3; ++i)
+                {
+                    for (j = 0; j < 3; ++j)
+                    {
+                    transpose[j][i]=(5*cofactor[i][j])%26;
+
+                    }
+
+                }
+
+                for (i = 0; i < 3; ++i)
+                {
+                    for (j = 0; j < 3; ++j)
+                    {
+
+                printf("%d\t", transpose[i][j]);
+                    }
+                    printf("\n");
+                }
+                printf("\n");
+
+                printf("Decrypted ciphertext is:  ");
+                n1=(n+temp)/3;
+                flag=0;
+                count=0;
+                temp1=0;
+                crypto(cipher,transpose);
+                return 0;
+}
+
